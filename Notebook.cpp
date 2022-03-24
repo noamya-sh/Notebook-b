@@ -1,40 +1,70 @@
 
 #include "Notebook.hpp"
-#include "Direction.hpp"
+#include "sources/Direction.hpp"
 #include <iostream>
 #include <unordered_map>
 #include <string>
 #include <stdexcept>
+
 using namespace std;
-namespace ariel{
-    Notebook::Notebook(){
-//        this->note = unordered_map<string, char>;
-    }
-    Notebook::~Notebook(){}
-    void Notebook::write(int page, int row, int col,Direction,string s){
-        if (col+(int)s.length() > 100)
-            throw out_of_range("row length is 100 characters.");
+namespace ariel {
+    Notebook::Notebook() {}
+    Notebook::~Notebook() {}
 
-//        char ch;
-//        int i=0;
-//        ch=s.at(i);
-    }
-    string Notebook::read(int page, int row, int col,Direction d, int length){
-//        Notebook::note n;
-        if (col+length > 100)
+    void Notebook::write(int page, int row, int col, Direction d, string s) {
+        if (col + (int) s.length() > 100)
             throw out_of_range("row length is 100 characters.");
-//        string s;
+        if (page < 0 || row < 0 || col < 0)
+            throw out_of_range("There is no negative number.");
+        bool flag = (d == Direction::Horizontal);
+        string temp;
+        for (unsigned int i = 0; i < s.length(); ++i) {
+            if (flag)
+                temp = to_string(page) + "," + to_string(row) + "," + to_string((unsigned int)col + i);
+            else
+                temp = to_string(page) + "," + to_string((unsigned int)row + i) + "," + to_string(col);
 
-//        int i = (d == Direction::Horizontal) ? col : row;
-//        int j = (d == Direction::Horizontal) ? row : col;
-//        for (; i < length; ++i) {
-//            if (umap.find(key) == umap.end())
-//        }
-        return "";
+            if (note.find(temp) == note.end() || note.at(temp) == '_')
+                note[temp] = s.at(i);
+            else
+                throw runtime_error("It is not possible to write about a written or deleted place.");
+        }
     }
-    void Notebook::erase(int page, int row, int col,Direction,  int length){
-        if (col+length > 100)
+
+    string Notebook::read(int page, int row, int col, Direction d, int length) {
+        if (col + length > 100)
             throw out_of_range("row length is 100 characters.");
+        string s;
+        bool flag = (d == Direction::Horizontal);
+        string temp;
+        for (unsigned int i = 0; i < length; ++i) {
+            if (flag)
+                temp = to_string(page) + "," + to_string(row) + "," + to_string((unsigned int)col + i);
+            else
+                temp = to_string(page) + "," + to_string((unsigned int)row + i) + "," + to_string(col);
+            if (note.find(temp) == note.end())
+                s += '_';
+            else
+                s += note.at(temp);
+        }
+        return s;
     }
-    void Notebook::show(int page){}
+
+    void Notebook::erase(int page, int row, int col, Direction d, int length) {
+        if (col + length > 100)
+            throw out_of_range("row length is 100 characters.");
+        bool flag = (d == Direction::Horizontal);
+        string temp;
+        for (unsigned int i = 0; i < length; ++i) {
+            if (flag)
+                temp = to_string(page) + "," + to_string(row) + "," + to_string((unsigned int)col + i);
+            else
+                temp = to_string(page) + "," + to_string((unsigned int)row + i) + "," + to_string(col);
+            note[temp] = '~';
+        }
+    }
+
+    void Notebook::show(int page) {
+    }
+
 }
