@@ -24,34 +24,31 @@ void Notebook::write(int page, int row, int col, Direction dir, string str) {
         return;
     }
     if (!Notebook::check1(page, row, col, dir, str)) {
-        throw invalid_argument{"you can't write here"};
+        throw invalid_argument("you can't write here");
     }
     check2(page, row, col, dir, str.length());
     char c = 0;
     for (unsigned int i = 0; i < str.length(); i++) {
         c = str.at(i);
         if (c < ' ' || c > '}') {
-            throw invalid_argument{"Illegal char"};
+            throw invalid_argument("Illegal char");
         }
     }
-    if (dir == Direction::Vertical) {
-        if (row + (int) str.length() > this->final_line) {
-            this->final_line = row + (int) str.length();
-        }
-    } else {
-        if (row > this->final_line) {
+    if (dir == Direction::Horizontal && row > this->final_line) {
             this->final_line = row + 1;
-        }
+    }
+
+    if (dir == Direction::Vertical && row + (int) str.length() > this->final_line) {
+            this->final_line = row + (int) str.length();
     }
     if (row < this->first_line) {
         this->first_line = row;
     }
     char ch = 0;
-
     for (unsigned int i = 0; i < str.length(); i++) {
         if (this->note[to_string(page) + "," + to_string(row) + "," + to_string(col)] != 0 &&
             this->note[to_string(page) + "," + to_string(row) + "," + to_string(col)] != '_') {
-            throw invalid_argument{"you can't write here"};
+            throw invalid_argument("you can't write here");
         }
         ch = str.at(i);
         this->note[to_string(page) + "," + to_string(row) + "," + to_string(col)] = ch;
@@ -77,17 +74,14 @@ string Notebook::read(int page, int row, int col, Direction dir, int length) {
 
 void Notebook::erase(int page, int row, int col, Direction dir, int length) {
     check2(page, row, col, dir, length);
-    if (dir == Direction::Vertical) {
-        if (row + length > this->final_line) {
-            this->final_line = row + length;
-        }
-    } else {
-        if (row > this->final_line) {
-            this->final_line = row;
-        }
-    }
     if (row < this->first_line) {
         this->first_line = row;
+    }
+    if (dir == Direction::Horizontal && row > this->final_line) {
+        this->final_line = row;
+    }
+    if (dir == Direction::Vertical && row + length > this->final_line){
+        this->final_line = row + length;
     }
     for (int i = 0; i < length; i++) {
         this->note[to_string(page) + "," + to_string(row) + "," + to_string(col)] = '~';
